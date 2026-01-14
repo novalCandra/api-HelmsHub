@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HelmController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,19 @@ Route::prefix('v1')->group(function () {
         Route::middleware('auth:sanctum')->group(function () {
             Route::get("/profile", [AuthController::class, "profile"]);
             Route::post('/logout', [AuthController::class, "logout"]);
+        });
+    });
+
+
+    Route::prefix('helments')->group(function () {
+        Route::middleware(['auth:sanctum', 'role:admin,user'])->group(function () {
+            Route::get('/', [HelmController::class, "index"]);
+            Route::get('/{id}', [HelmController::class, "show"]);
+        });
+        Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+            Route::post('/', [HelmController::class, "store"]);
+            Route::put('/{id}', [HelmController::class, "update"]);
+            Route::delete('/{id}', [HelmController::class, "destroy"]);
         });
     });
 });
