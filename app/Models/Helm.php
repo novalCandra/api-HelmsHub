@@ -9,4 +9,9 @@ class Helm extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public function borroweds()
+    {
+        return parent::belongsTo(Borrowed::class);
+    }
 }
