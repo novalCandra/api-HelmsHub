@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BorrowedController;
 use App\Http\Controllers\HelmController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,17 @@ Route::prefix('v1')->group(function () {
         Route::middleware(['auth:sanctum', 'role:admin,petugas'])->group(function () {
             Route::get('/', [BorrowedController::class, "index"]);
             Route::get('/{id}', [BorrowedController::class, "show"]);
+        });
+    });
+
+
+    Route::prefix('transaction')->group(function () {
+        Route::middleware('auth:sanctum', 'role:user')->group(function () {
+            Route::get('/{id}', [TransactionController::class, "show"]);
+            Route::post('/', [TransactionController::class, "store"]);
+        });
+        Route::middleware('auth:sanctum', 'role:admin,penjaga')->group(function () {
+            Route::get('/', [TransactionController::class, "index"]);
         });
     });
 });

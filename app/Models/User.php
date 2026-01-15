@@ -48,4 +48,9 @@ class User extends Authenticatable
         return parent::hasOne(Borrowed::class);
     }
     
+
+    public function transactions()
+    {
+        return parent::hasOne(Transaction::class);
+    }
 }
