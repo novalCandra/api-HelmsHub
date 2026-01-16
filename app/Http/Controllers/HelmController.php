@@ -10,9 +10,10 @@ class HelmController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $helmAll = Helm::paginate(10);
+        $per_page = $request->get('per_page', 10);
+        $helmAll = Helm::paginate($per_page);
         return response()->json([
             "status" => true,
             "message" => "succes all data Helms",
