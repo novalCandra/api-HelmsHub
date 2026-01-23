@@ -38,10 +38,9 @@ Route::prefix('v1')->group(function () {
     Route::prefix('borroed')->group(function () {
         Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
             Route::post('/', [BorrowedController::class, "store"]);
-            Route::get('/{id}', [BorrowedController::class, "show"]);
         });
 
-        Route::middleware(['auth:sanctum', 'role:admin,petugas'])->group(function () {
+        Route::middleware(['auth:sanctum', 'role:admin,petugas,user'])->group(function () {
             Route::get('/', [BorrowedController::class, "index"]);
             Route::get('/{id}', [BorrowedController::class, "show"]);
         });
