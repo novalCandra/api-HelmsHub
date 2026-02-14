@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('helmet_id')->constrained('helms')->onDelete('cascade');
             $table->date('borrow_date');
-            $table->date('due_date');
+            $table->date('due_date')->nullable();
             $table->date('return_date');
             $table->enum('status', ['borrowed', 'returned', 'late'])->default('borrowed');
             $table->timestamps();

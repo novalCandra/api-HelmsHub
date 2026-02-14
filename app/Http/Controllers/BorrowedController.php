@@ -39,7 +39,7 @@ class BorrowedController extends Controller
         $request->validate([
             "helmet_id" => "required|exists:helms,id",
             "borrow_date" => "required|date",
-            "due_date" => "required|date",
+            "due_date" => "nullable|date",
             "return_date" => "required|date",
         ]);
 
