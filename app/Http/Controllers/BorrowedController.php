@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Borrowed;
-use App\Models\Helm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,9 +25,37 @@ class BorrowedController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function profileMe()
     {
-        //
+        $user = Auth::user();
+
+        $borrowed = Borrowed::with(['Users', 'Helm'])->where('user_id', $user->id)->where('status', 'borrowed')->latest()->first();
+
+        // Total Helm yang di pinjam
+        $totalBorrowed = Borrowed::with('user_id', $user->id)->where('status', 'borrowed')->count();
+
+        $borrowed->totalBorrowed = $totalBorrowed;
+        try {
+            if (!$borrowed) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "You don't have any borrowed items",
+                    "total_borrowed" => 0
+                ]);
+            } else {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Success get Borrowed",
+                    "data" => $borrowed
+                ], 200);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "api not found",
+                "error" => $th->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -84,9 +111,38 @@ class BorrowedController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Borrowed $borrowed)
+    public function update($id)
     {
-        //
+        $ReturnBorrowed = Borrowed::findOrFail($id);
+
+        if ($ReturnBorrowed->status !== "borrowed") {
+            return response()->json([
+                "message" => "This helmet is still on loan."
+            ], 403);
+        }
+        $ReturnBorrowed->update([
+            "status" => "returned"
+        ]);
+
+        try {
+            if (!$ReturnBorrowed) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Cannot return a helmet"
+                ], 402);
+            } else {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Sucess Returning a Helmet"
+                ], 201);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => "api not found",
+                "error" => $th->getMessage()
+            ]);
+        }
     }
 
     /**
