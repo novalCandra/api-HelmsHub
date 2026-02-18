@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BorrowedController;
 use App\Http\Controllers\HelmController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,7 +47,6 @@ Route::prefix('v1')->group(function () {
         });
     });
 
-
     Route::prefix('transaction')->group(function () {
         Route::middleware('auth:sanctum', 'role:user')->group(function () {
             Route::get('/{id}', [TransactionController::class, "show"]);
@@ -54,6 +54,13 @@ Route::prefix('v1')->group(function () {
         });
         Route::middleware('auth:sanctum', 'role:admin,penjaga')->group(function () {
             Route::get('/', [TransactionController::class, "index"]);
+        });
+    });
+
+    Route::prefix('manage')->group(function () {
+        Route::middleware(['auth:sanctum', 'role:petugas'])->group(function () {
+            Route::get('/', [UserController::class, "manageUsers"]);
+            Route::post('/{id}', [UserController::class, "bannedUsers"]);
         });
     });
 });
