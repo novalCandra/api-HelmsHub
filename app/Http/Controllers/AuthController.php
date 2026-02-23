@@ -57,10 +57,10 @@ class AuthController extends Controller
         $createRegister = User::create([
             "full_name" => $request->full_name,
             "email" => $request->email,
-            "password" => $request->password,
+            "password" => Hash::make($request->password),
             "phone_number" => $request->phone_number
         ]);
-
+        $createRegister->sendEmailVerificationNotification();
         return response()->json([
             "status" => true,
             "message" => "success Register",
