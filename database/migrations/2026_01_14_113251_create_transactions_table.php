@@ -16,11 +16,14 @@ return new class extends Migration
             $table->foreignId('borrowed_id')->constrained('borroweds')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('helm_id')->constrained('helms')->onDelete('cascade');
+            $table->string('external_id')->nullable();
+            $table->string('xendit_invoice_id')->nullable();
+            $table->string('invoice_url')->nullable();
             $table->decimal('total_price', 18, 2);
             $table->decimal('fine_amount', 18, 2);
-            $table->enum('payment_method', ['cash', 'transfer', 'e-wallet'])->default('cash');
+            $table->enum('payment_method', ['cash', 'transfer', 'e-wallet'])->default('transfer');
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
-            $table->date('payment_date');
+            $table->date('payment_date')->nullable();
             $table->timestamps();
         });
     }

@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('borroweds', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('helmet_id')->constrained('helms')->onDelete('cascade');
+            $table->foreignId('helm_id')->constrained('helms')->onDelete('cascade');
             $table->date('borrow_date');
             $table->date('due_date')->nullable();
             $table->date('return_date');
-            $table->enum('status', ['borrowed', 'returned', 'late'])->default('borrowed');
+            $table->enum('payment_status', ['borrowed', 'returned', 'late', 'paid'])->default('borrowed');
             $table->timestamps();
         });
     }
