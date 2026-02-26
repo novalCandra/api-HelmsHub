@@ -13,9 +13,9 @@ class Borrowed extends Model
         return parent::belongsTo(User::class, "user_id");
     }
 
-    public function Helm()
+    public function helm()
     {
-        return parent::belongsTo(Helm::class, "helmet_id");
+        return parent::belongsTo(Helm::class, "helm_id");
     }
 
     public function transactions()

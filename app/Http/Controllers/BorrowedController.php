@@ -3,17 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Models\Borrowed;
+use App\Models\Transaction;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Xendit\Configuration;
+use Xendit\Invoice\CreateInvoiceRequest;
+use Xendit\Invoice\InvoiceApi;
 
 class BorrowedController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+    // Create Invoice Xendit
+    protected InvoiceApi $invoicapi;
+
+    public function __construct()
+    {
+        Configuration::setXenditKey(
+            config('services.xendit.secret_key')
+        );
+
+        $this->invoicapi = new InvoiceApi();
+    }
+
+
     public function index()
     {
-        $BorrowedAll = Borrowed::with(['Users', 'Helm'])->get();
+        $BorrowedAll = Borrowed::with(['Users', 'helm'])->get();
 
         return response()->json([
             "status" => true,
@@ -29,10 +48,10 @@ class BorrowedController extends Controller
     {
         $user = Auth::user();
 
-        $borrowed = Borrowed::with(['Users', 'Helm'])->where('user_id', $user->id)->where('status', 'borrowed')->latest()->first();
+        $borrowed = Borrowed::with(['Users', 'helm'])->where('user_id', $user->id)->where('payment_status', 'borrowed')->latest()->first();
 
         // Total Helm yang di pinjam
-        $totalBorrowed = Borrowed::with('user_id', $user->id)->where('status', 'borrowed')->count();
+        $totalBorrowed = Borrowed::with('user_id', $user->id)->where('payment_status', 'borrowed')->count();
 
         $borrowed->totalBorrowed = $totalBorrowed;
         try {
@@ -64,7 +83,7 @@ class BorrowedController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            "helmet_id" => "required|exists:helms,id",
+            "helm_id" => "required|exists:helms,id",
             "borrow_date" => "required|date",
             "due_date" => "nullable|date",
             "return_date" => "required|date",
@@ -74,7 +93,7 @@ class BorrowedController extends Controller
 
         $BorrowCreated = Borrowed::create([
             "user_id" => $user->id,
-            "helmet_id" => $request->helmet_id,
+            "helm_id" => $request->helm_id,
             "borrow_date" => $request->borrow_date,
             "due_date" => $request->due_date,
             "return_date" => $request->return_date
@@ -92,7 +111,7 @@ class BorrowedController extends Controller
      */
     public function show($id)
     {
-        $borrowedDetails = Borrowed::with(['Users', 'Helm'])->findOrFail($id);
+        $borrowedDetails = Borrowed::with(['Users', 'helm'])->findOrFail($id);
         return response()->json([
             "status" => true,
             "message" => "success details Borrowed",
@@ -115,13 +134,13 @@ class BorrowedController extends Controller
     {
         $ReturnBorrowed = Borrowed::findOrFail($id);
 
-        if ($ReturnBorrowed->status !== "borrowed") {
+        if ($ReturnBorrowed->payment_status !== "borrowed") {
             return response()->json([
                 "message" => "This helmet is still on loan."
             ], 403);
         }
         $ReturnBorrowed->update([
-            "status" => "returned"
+            "payment_status" => "returned"
         ]);
 
         try {
@@ -143,6 +162,60 @@ class BorrowedController extends Controller
                 "error" => $th->getMessage()
             ]);
         }
+    }
+
+    public function returnBorrowed($id)
+    {
+        $user = Auth::user();
+        $borrowed = Borrowed::with('helm')->where('user_id', $user->id)->where('payment_status', 'borrowed')->findOrFail($id);
+
+
+        $today = Carbon::now();
+        $borrowDate =  Carbon::parse($borrowed->borrow_date);
+        $returnDate = Carbon::parse($borrowed->return_date);
+
+
+        // Hitung jumlah
+        $totalDays = $borrowDate->diffInDays($today);
+        $dailyPrice = $borrowed->helm->daily_price;
+
+        $lateFree = 0;
+
+        if ($today->gt($returnDate)) {
+            $lateDays = $returnDate->diffInDays($today);
+            $lateFree = $lateDays * $borrowed->helm->late_free_per_day;
+        }
+
+        $totalAmount = ($totalDays * $dailyPrice) + $lateFree;
+
+        // Create Transaksi
+        $transaction = Transaction::create([
+            'borrowed_id' => $borrowed->id,
+            'user_id' => $user->id,
+            'helm_id' => $borrowed->helm_id,
+            'total_price' => $totalAmount,
+            'fine_amount' => $lateFree,
+            'payment_status' => 'pending',
+            'payment_date' => now(),
+        ]);
+
+        // Upaate status jadi waiting payment
+        $borrowed->update([
+            'payment_status' => 'paid'
+        ]);
+
+        $createInvoiceRequest = new CreateInvoiceRequest([
+            'external_id' => 'TRX-' . $transaction->id,
+            'amount' => $totalAmount,
+            'payer_email' => Auth::user()->email,
+            'description' => 'Payment for helmet return',
+        ]);
+
+        $invoice = $this->invoicapi->createInvoice($createInvoiceRequest);
+        return response()->json([
+            'invoice_url' => $invoice['invoice_url'],
+            'total_amount' => $totalAmount
+        ]);
     }
 
     /**
