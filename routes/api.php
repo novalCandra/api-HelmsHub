@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BorrowedController;
 use App\Http\Controllers\HelmController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -47,9 +48,14 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    Route::prefix('return')->group(function () {
+        Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
+            Route::post('/{id}', [BorrowedController::class, "returnBorrowed"]);
+        });
+    });
+
     Route::prefix('transaction')->group(function () {
         Route::middleware('auth:sanctum', 'role:user')->group(function () {
-            Route::get('/{id}', [TransactionController::class, "show"]);
             Route::post('/', [TransactionController::class, "store"]);
         });
         Route::middleware('auth:sanctum', 'role:admin,penjaga')->group(function () {
@@ -64,3 +70,6 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+
+Route::post('/xendit/webhook', [PaymentController::class, "webHook"]);
+Route::post('/xendit/webhook', [PaymentController::class, "hanldeBook"]);
