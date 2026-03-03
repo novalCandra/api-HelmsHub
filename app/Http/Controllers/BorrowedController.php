@@ -30,15 +30,28 @@ class BorrowedController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
-        $BorrowedAll = Borrowed::with(['Users', 'helm'])->get();
-
+        $per_page = $request->get('per_page', 10);
+        $BorrowedAll = Borrowed::with(['Users', 'helm'])->paginate($per_page);
         return response()->json([
             "status" => true,
             "message" => "Success add Borrowed All",
             "data" => $BorrowedAll
         ],  200);
+    }
+
+
+    public function getStats()
+    {
+        $retunrned = Borrowed::where("payment_status", "returned")->count();
+        $latenned = Borrowed::where("payment_status", "late")->count();
+
+        return response()->json([
+            "status" => true,
+            "return_stats" => $retunrned,
+            "latenned_stats" => $latenned
+        ], 200);
     }
 
     /**

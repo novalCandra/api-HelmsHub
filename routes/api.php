@@ -36,15 +36,17 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('borroed')->group(function () {
+
+        Route::middleware(['auth:sanctum', 'role:admin,petugas'])->group(function () {
+            Route::get('/', [BorrowedController::class, "index"]);
+            Route::get('/stats', [BorrowedController::class, "getStats"]);
+        });
+
         Route::middleware(['auth:sanctum', 'role:user'])->group(function () {
             Route::get('/profileMe', [BorrowedController::class, "profileMe"]);
             Route::get('/{id}', [BorrowedController::class, "show"]);
             Route::post('/', [BorrowedController::class, "store"]);
             Route::post('/{id}', [BorrowedController::class, "update"]);
-        });
-
-        Route::middleware(['auth:sanctum', 'role:admin,petugas'])->group(function () {
-            Route::get('/', [BorrowedController::class, "index"]);
         });
     });
 
