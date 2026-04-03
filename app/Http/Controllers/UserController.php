@@ -3,9 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function CreateUser(Request $request)
+    {
+        $request->validate([
+            "full_name" => "required|string|min:1|max:255",
+            "email" => "required|string|min:1|max:255",
+            "password" => "required|string|min:1|max:255",
+            "phone_number" => ["required", "string", "regex:#^(\+62|0)[0-9]{9,13}$#"]
+        ]);
+        $CreateAccount = User::create([
+            "full_name" => $request->full_name,
+            "email" => $request->email,
+            "password" => Hash::make($request->password),
+            "phone_number" => $request->phone_number
+        ]);
+
+        try {
+            if (!$CreateAccount) {
+                return response()->json([
+                    "message" => "not Create Account"
+                ]);
+            } else {
+                return response()->json([
+                    "message" => "Success",
+                    "data" => $CreateAccount
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "message" => $th->getMessage()
+            ]);
+        }
+    }
     public function manageUsers()
     {
         $manageUsers = User::where('role', 'user')->get();
