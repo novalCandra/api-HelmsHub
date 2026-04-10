@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Helm;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Spatie\LaravelPdf\Facades\Pdf;
+use Xendit\Invoice\Invoice;
+
+use function Spatie\LaravelPdf\Support\pdf;
 
 class HelmController extends Controller
 {
@@ -73,9 +78,13 @@ class HelmController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Helm $helm)
+    public function __invoke(Invoice $invoice)
     {
-        //
+        $userPDF = Auth::user();
+        $HelmAll = Helm::paginate(10);
+        $pdf = Pdf::view('pdf.invoice', compact(['userPDF', 'HelmAll']));
+        $id = str()->random(8);
+        return $pdf->download("invoice-{$id}.pdf");
     }
 
     /**

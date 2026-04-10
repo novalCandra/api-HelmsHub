@@ -20,6 +20,14 @@ class AuthController extends Controller
         ], 200);
     }
 
+
+    public function profilePDF()
+    {
+        $userPDF = Auth::user();
+        @@dd($userPDF);
+        return view('pdf.invoice', compact('userPDF'));
+    }
+
     public function login(Request $request)
     {
         $request->validate([

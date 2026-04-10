@@ -30,6 +30,8 @@ Route::prefix('v1')->group(function () {
         });
         Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
             Route::post('/', [HelmController::class, "store"]);
+            Route::get('/pdf/data', [AuthController::class, "profilePDF"]);
+            Route::post("/pdf", [HelmController::class, "__invoke"]);
             Route::put('/{id}', [HelmController::class, "update"]);
             Route::delete('/{id}', [HelmController::class, "destroy"]);
         });
