@@ -12,6 +12,8 @@
         "laravel/tinker": "^2.10.1",
         "midtrans/midtrans-php": "^2.6",
         "railsware/mailtrap-php": "^3.10",
+        "spatie/browsershot": "^5.2",
+        "spatie/laravel-pdf": "^2.5",
         "xendit/xendit-php": "^7.0"
     },
     "require-dev": {
