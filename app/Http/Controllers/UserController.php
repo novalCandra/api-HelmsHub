@@ -89,4 +89,65 @@ class UserController extends Controller
             ]);
         }
     }
+
+    public function updateUsers(Request $request, $id)
+    {
+        $updateDataUsers = User::findOrFail($id);
+
+        $request->validate([
+            "full_name" => "required|string|min:1|max:255",
+            "email" => "required|string|min:1|max:255",
+            "password" => "required|string|min:1|max:255",
+            "phone_number" => ["required", "string", "regex:#^(\+62|0)[0-9]{9,13}$#"]
+        ]);
+
+        $updateDataUsers->update([
+            "full_name" => $request->full_name,
+            "email" => $request->email,
+            "password" => Hash::make($request->password),
+            "phone_number" => $request->phone_number
+        ]);
+        try {
+            if (!$updateDataUsers) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "not Update users"
+                ], 402);
+            } else {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Success Update users",
+                    "data" => $updateDataUsers
+                ], 200);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteData($id)
+    {
+        $DeleteDatUsers = User::destroy($id);
+        try {
+            if (!$DeleteDatUsers) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "not delete users"
+                ], 402);
+            } else {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Success Delete users"
+                ], 200);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => $th->getMessage()
+            ], 500);
+        }
+    }
 }
