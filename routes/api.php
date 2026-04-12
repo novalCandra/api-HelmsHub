@@ -69,10 +69,13 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('manage')->group(function () {
         Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+            Route::get('/', [UserController::class, "manageUsers"]);
             Route::post('/', [UserController::class, "CreateUser"]);
+            Route::put('/{id}', [UserController::class, "updateUsers"]);
+            Route::delete('/{id}', [UserController::class, "deleteData"]);
         });
         Route::middleware(['auth:sanctum', 'role:petugas'])->group(function () {
-            Route::get('/', [UserController::class, "manageUsers"]);
+            Route::get('/banned', [UserController::class, "manageUsers"]);
             Route::post('/{id}', [UserController::class, "bannedUsers"]);
         });
     });

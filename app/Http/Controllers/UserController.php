@@ -97,14 +97,13 @@ class UserController extends Controller
         $request->validate([
             "full_name" => "required|string|min:1|max:255",
             "email" => "required|string|min:1|max:255",
-            "password" => "required|string|min:1|max:255",
+            "password" => "nullable|string|min:1|max:255",
             "phone_number" => ["required", "string", "regex:#^(\+62|0)[0-9]{9,13}$#"]
         ]);
 
         $updateDataUsers->update([
             "full_name" => $request->full_name,
             "email" => $request->email,
-            "password" => Hash::make($request->password),
             "phone_number" => $request->phone_number
         ]);
         try {
@@ -141,6 +140,30 @@ class UserController extends Controller
                 return response()->json([
                     "status" => true,
                     "message" => "Success Delete users"
+                ], 200);
+            }
+        } catch (\Throwable $th) {
+            return response()->json([
+                "status" => false,
+                "message" => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function detailUsers($id)
+    {
+        $DetailUser = User::findOrFail($id);
+        try {
+            if (!$DetailUser) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "tidak bisa detail users"
+                ], 402);
+            } else {
+                return response()->json([
+                    "status" => true,
+                    "message" => "success detail data",
+                    "data" => $DetailUser
                 ], 200);
             }
         } catch (\Throwable $th) {
