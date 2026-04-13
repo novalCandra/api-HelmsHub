@@ -17,7 +17,7 @@ class CategorieFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            "nama" => fake()->randomElement(['sport', 'full_face', 'dual_shory'])
         ];
     }
 }

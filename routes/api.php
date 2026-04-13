@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BorrowedController;
+use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\HelmController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TransactionController;
@@ -77,6 +78,16 @@ Route::prefix('v1')->group(function () {
         Route::middleware(['auth:sanctum', 'role:petugas'])->group(function () {
             Route::get('/banned', [UserController::class, "manageUsers"]);
             Route::post('/{id}', [UserController::class, "bannedUsers"]);
+        });
+    });
+
+    Route::prefix('category')->group(function () {
+        Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+            Route::get('/', [CategorieController::class, "index"]);
+            Route::get('/{id}', [CategorieController::class, "create"]);
+            Route::post('/', [CategorieController::class, "store"]);
+            Route::put('/{id}', [CategorieController::class, "update"]);
+            Route::delete('/{id}', [CategorieController::class, "destroy"]);
         });
     });
 });

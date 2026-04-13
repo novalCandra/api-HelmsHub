@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('helms', function (Blueprint $table) {
             $table->id();
             $table->string('helmet_name');
+            $table->foreignId('id_category')->constrained('categories')->onDelete('cascade');
             $table->enum('condition', ['good', 'very_good', 'excellent'])->default('good');
             $table->enum('status', ['available', 'rented', 'maintenance'])->default('available');
             $table->decimal('daily_price', 15, 2);
