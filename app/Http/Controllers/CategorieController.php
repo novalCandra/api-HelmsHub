@@ -116,6 +116,10 @@ class CategorieController extends Controller
         $request->validate([
             "nama" => "required|string"
         ]);
+
+        $UpdateCategorie->update([
+            "nama" => $request->nama
+        ]);
         try {
             if (!$UpdateCategorie) {
                 return response()->json([
