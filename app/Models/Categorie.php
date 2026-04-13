@@ -9,4 +9,9 @@ class Categorie extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public function helm()
+    {
+        return parent::hasMany(Helm::class, "id");
+    }
 }
