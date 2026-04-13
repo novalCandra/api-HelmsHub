@@ -14,4 +14,9 @@ class Helm extends Model
     {
         return parent::belongsTo(Borrowed::class);
     }
+
+    public function categories()
+    {
+        return parent::belongsTo(Categorie::class, "id_category");
+    }
 }

@@ -18,7 +18,7 @@ class HelmController extends Controller
     public function index(Request $request)
     {
         $per_page = $request->get('per_page', 10);
-        $helmAll = Helm::paginate($per_page);
+        $helmAll = Helm::with('categories')->paginate($per_page);
         return response()->json([
             "status" => true,
             "message" => "succes all data Helms",
@@ -42,6 +42,7 @@ class HelmController extends Controller
         $request->validate([
             "helmet_name" => "required|string|min:1|max:255",
             "condition" => "required|string|min:1|max:255",
+            "id_category" => "required|string",
             "status" => "required|string|min:1|max:255",
             "daily_price" => "required|numeric",
             "late_fee_per_day" => "required|numeric",
@@ -51,6 +52,7 @@ class HelmController extends Controller
             "helmet_name" => $request->helmet_name,
             "condition" => $request->condition,
             "status" => $request->status,
+            "id_category" => $request->id_category,
             "daily_price" => $request->daily_price,
             "late_fee_per_day" => $request->late_fee_per_day
         ]);
@@ -67,7 +69,7 @@ class HelmController extends Controller
      */
     public function show($id)
     {
-        $UserDetail = Helm::findOrFail($id);
+        $UserDetail = Helm::with('categories')->findOrFail($id);
         return response()->json([
             "status" => true,
             "message" => "Succes Details Helms",
@@ -97,12 +99,14 @@ class HelmController extends Controller
             "helmet_name" => "required|string|min:1|max:255",
             "condition" => "required|string|min:1|max:255",
             "status" => "required|string|min:1|max:255",
+            "id_category" => "required|string",
             "daily_price" => "required|numeric",
             "late_fee_per_day" => "required|numeric",
         ]);
 
         $HelmUpdate->update([
             "helmet_name" => $request->helmet_name,
+            "id_category" => $request->id_category,
             "condition" => $request->condition,
             "status" => $request->status,
             "daily_price" => $request->daily_price,

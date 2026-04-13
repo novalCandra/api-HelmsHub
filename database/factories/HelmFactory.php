@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Categorie;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,6 +23,7 @@ class HelmFactory extends Factory
                 "Shoies X16",
                 "KYT"
             ]),
+            'id_category' => Categorie::factory(),
             'condition' => $this->faker->randomElement(['good', 'very_good', 'excellent']),
             'status' => $this->faker->randomElement(['available', 'rented', 'maintenance']),
             'daily_price' => $this->faker->numberBetween(20000, 800000),
