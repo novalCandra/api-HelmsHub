@@ -24,6 +24,8 @@ class HelmFactory extends Factory
                 "KYT"
             ]),
             'id_category' => Categorie::factory(),
+            'image' => '/public/storage/image' . $this->faker->imageUrl(600, 400, "https://placehold.co/600x400.png"),
+            'image_url' => "https://placehold.co/600x400/png",
             'condition' => $this->faker->randomElement(['good', 'very_good', 'excellent']),
             'status' => $this->faker->randomElement(['available', 'rented', 'maintenance']),
             'daily_price' => $this->faker->numberBetween(20000, 800000),

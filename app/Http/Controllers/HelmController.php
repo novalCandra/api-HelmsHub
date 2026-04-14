@@ -43,15 +43,19 @@ class HelmController extends Controller
             "helmet_name" => "required|string|min:1|max:255",
             "condition" => "required|string|min:1|max:255",
             "id_category" => "required|string",
+            "image" => "nullable|image|mimes:jpeg,jpg,png",
             "status" => "required|string|min:1|max:255",
             "daily_price" => "required|numeric",
             "late_fee_per_day" => "required|numeric",
         ]);
 
+        $imagePath = $request->file('image')->store('image', 'public');
         $HelmCreate = Helm::create([
             "helmet_name" => $request->helmet_name,
             "condition" => $request->condition,
             "status" => $request->status,
+            "image" => $imagePath,
+            "image_url" => asset('storage/' . $imagePath),
             "id_category" => $request->id_category,
             "daily_price" => $request->daily_price,
             "late_fee_per_day" => $request->late_fee_per_day

@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('helmet_name');
             $table->foreignId('id_category')->constrained('categories')->onDelete('cascade');
+            $table->string('image')->nullable();
+            $table->string('image_url')->nullable();
             $table->enum('condition', ['good', 'very_good', 'excellent'])->default('good');
             $table->enum('status', ['available', 'rented', 'maintenance'])->default('available');
             $table->decimal('daily_price', 15, 2);
