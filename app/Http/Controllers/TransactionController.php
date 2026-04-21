@@ -50,8 +50,8 @@ class TransactionController extends Controller
             $request->validate([
                 "borrowed_id" => "required|exists:borroweds,id",
                 "helm_id" => "required|exists:helms,id",
-                "amount" => "required|numeric|min:1000",
-                "email" => "required|email"
+                "fine_amount" => "required|numeric|min:1000",
+                "email" => "nullable|email"
             ]);
 
             $externalId = 'INV-' . uniqid();
@@ -60,7 +60,7 @@ class TransactionController extends Controller
                 "borrowed_id" => $request->borrowed_id,
                 "helm_id" => $request->helm_id,
                 "user_id" => $user->id,
-                "total_price" => $request->amount,
+                "total_price" => $request->total_price,
                 "fine_amount" => 0,
                 "payment_method" => 'transfer',
                 "payment_status" => 'pending',
@@ -69,7 +69,7 @@ class TransactionController extends Controller
             // Invoice Xendit
             $createInvoice = new CreateInvoiceRequest([
                 'external_id' => $externalId,
-                'amount' => $request->amount,
+                'amount' => $request->fine_amount,
                 'payer_email' => $request->email,
                 'description' => "pembayaran helm",
                 // kembali ke webiste
